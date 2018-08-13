@@ -58,5 +58,8 @@ module.exports = {
     extend(config, ctx) {
 
     }
+  },
+  env: {
+    fbAPIKey: 'AIzaSyAahMv2__GXA3sfl9il3Q9DHyhMSpWcuso'
   }
 }
