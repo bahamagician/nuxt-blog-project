@@ -111,12 +111,21 @@ const createStore = () => {
         // If the token is expired or doesn't exist then just return the function
         if (new Date().getTime() > +expirationDate || !token) {
           console.log('no token or invalid token');
-          vuexContext.commit('clearToken');
+          vuexContext.dispatch('logout');
           return;
         }
 
         // If the token does exist, then add it to state
         vuexContext.commit('setToken', token);
+      },
+      logout(vuexContext) {
+        vuexContext.commit('clearToken');
+        Cookie.remove('jwt');
+        Cookie.remove('expirationDate');
+        if (process.client) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('tokenExpiration');
+        }
       }
     },
     getters: {
