@@ -75,17 +75,11 @@ const createStore = () => {
         .then(result => {
           vuexContext.commit('setToken', result.idToken);
           localStorage.setItem('token', result.idToken);
-          localStorage.setItem('tokenExpiration', new Date().getTime() + result.expiresIn * 1000);
+          localStorage.setItem('tokenExpiration', new Date().getTime() + Number.parseInt(result.expiresIn) * 1000);
           Cookie.set('jwt', result.idToken);
-          Cookie.set('expirationDate', new Date().getTime() + result.expiresIn * 1000 )
-          vuexContext.dispatch('setLogoutTimer', result.expiresIn * 1000);
+          Cookie.set('expirationDate', new Date().getTime() + Number.parseInt(result.expiresIn) * 1000);
         })
         .catch(e => console.log(e));
-      },
-      setLogoutTimer(vuexContext, duration) {
-        setTimeout(() => {
-          vuexContext.commit('clearToken');
-        }, duration)
       },
       initAuth(vuexContext, req) {
         let token;
@@ -112,15 +106,16 @@ const createStore = () => {
            // Get token & expiry from local storage
           token = localStorage.getItem('token');
           expirationDate = localStorage.getItem('tokenExpiration');
+        }
 
-          // If the token is expired or doesn't exist then just return the function
-          if (new Date().getTime > +expirationDate || !token) {
-            return;
-          }
+        // If the token is expired or doesn't exist then just return the function
+        if (new Date().getTime() > +expirationDate || !token) {
+          console.log('no token or invalid token');
+          vuexContext.commit('clearToken');
+          return;
         }
 
         // If the token does exist, then add it to state
-        // vuexContext.dispatch('setLogoutTimer', +expirationDate - new Date().getTime());
         vuexContext.commit('setToken', token);
       }
     },
